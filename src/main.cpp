@@ -44,6 +44,10 @@ int main() {
             } else {
                 std::cout << "Value: " << value << "\n";
             }
+
+        } else if (tokens[0] == "REPLAY") {
+            std::cout << "Replay functionality not implemented yet.\n";
+
         } else {
             std::cout << "Invalid command: " << tokens[0] << "\n";
         }
