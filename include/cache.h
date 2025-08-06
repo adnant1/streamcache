@@ -35,11 +35,11 @@ namespace streamcache {
            void set(const std::string& key, const CacheEntry& entry);
 
             /*
-            * Retrieves a value from the cache.
+            * Retrieves a value from the cache. If the key has expired, it is removed from the cache.
             *
             * @param key The key for the cache entry.
-            * @return The value associated with the key, or an empty string if not found.
+            * @return The value associated with the key, or NULL if not found.
             */
-           std::string get(const std::string& key) const;
+           std::optional<std::string> get(const std::string& key);
     };
 }
