@@ -8,16 +8,18 @@ namespace streamcache {
         return cache.empty();
     }
 
-    void Cache::set(const std::string& key, const std::string& value) {
-        cache[key] = value;
+    void Cache::set(const std::string& key, const CacheEntry& entry) {
+        cache[key] = entry;
     }
 
     std::string Cache::get(const std::string& key) const {
-        auto it = cache.find(key);
-        if (it != cache.end()) {
-            return it->second;
+        if (cache.find(key) != cache.end()) {
+            const auto& entry = cache.at(key);
+            if (!entry.expiration || entry.expiration.value() > std::chrono::system_clock::now()) {
+                return entry.value;
+            }
         }
+
         return {};
     }
-
 }
