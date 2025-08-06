@@ -3,6 +3,7 @@
 #include <sstream>
 #include <vector>
 #include "command_parser.h"
+#include "cache_builder.h"
 #include "cache.h"
 
 /*
@@ -27,11 +28,13 @@ int main() {
         }
 
         if (tokens[0] == "SET") {
-            if (tokens.size() != 3) {
-                std::cout << "Usage: SET <key> <value>\n";
+            auto entry = cache_builder::buildCacheEntry(tokens);
+            if (!entry) {
+                std::cout << "Usage: SET <key> <value> <metadata>\n";
                 continue;
             }
-            cache.set(tokens[1], tokens[2]);
+
+            cache.set(tokens[1], *entry);
 
         } else if (tokens[0] == "GET") {
             if (tokens.size() != 2) {
