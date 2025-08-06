@@ -41,11 +41,11 @@ int main() {
                 std::cout << "Usage: GET <key>\n";
                 continue;
             }
-            std::string value = cache.get(tokens[1]);
-            if (value.empty()) {
+            auto value = cache.get(tokens[1]);
+            if (!value) {
                 std::cout << "Key not found.\n";
             } else {
-                std::cout << "Value: " << value << "\n";
+                std::cout << "Value: " << *value << "\n";
             }
 
         } else if (tokens[0] == "REPLAY") {
