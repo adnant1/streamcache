@@ -7,7 +7,7 @@
 
 namespace cache_builder {
 
-    /*
+    /**
      * Builds a cache entry from the given vector of tokens.
      *
      * @param tokens The vector of strings representing the command tokens.

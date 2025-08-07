@@ -10,16 +10,16 @@
  * Core runtime REPL loop for the engine.
  */
 int main() {
-    streamcache::Cache cache;
+    streamcache::Cache cache {};
 
     while(true) {
         cache.evictExpired();
         std::cout << "> " << std::flush;
 
-        std::string input{};
+        std::string input {};
         std::getline(std::cin, input);
 
-        auto tokens{ command_parser::parse(input) };
+        auto tokens {command_parser::parse(input)};
         if (tokens.empty()) {
             continue;
         }       
@@ -29,7 +29,7 @@ int main() {
         }
 
         if (tokens[0] == "SET") {
-            auto entry = cache_builder::buildCacheEntry(tokens);
+            auto entry {cache_builder::buildCacheEntry(tokens)};
             if (!entry) {
                 std::cout << "Usage: SET <key> <value> <metadata>\n";
                 continue;
@@ -42,7 +42,8 @@ int main() {
                 std::cout << "Usage: GET <key>\n";
                 continue;
             }
-            auto value = cache.get(tokens[1]);
+
+            auto value {cache.get(tokens[1])};
             if (!value) {
                 std::cout << "Key not found.\n";
             } else {

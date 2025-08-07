@@ -7,7 +7,7 @@ namespace cache_builder {
             return std::nullopt;
         }
 
-        streamcache::CacheEntry entry;
+        streamcache::CacheEntry entry {};
         entry.value = tokens[2];
 
         /*
@@ -16,7 +16,7 @@ namespace cache_builder {
         */
         if (tokens.size() >= 4) {
             try {
-                int ttl = std::stoi(tokens[3]);
+                int ttl {std::stoi(tokens[3])};
                 if (ttl < 0) {
                     return std::nullopt;
                 }

@@ -17,11 +17,9 @@ namespace streamcache {
     }
 
     std::optional<std::string> Cache::get(const std::string& key) {
-        auto it = m_cache.find(key);
+        auto it {m_cache.find(key)};
         if (it != m_cache.end()) {
-            const auto& entry = it->second;
-            auto now = std::chrono::system_clock::now();
-
+            const auto& entry {it->second};
             return entry.value;
         }
 
@@ -29,17 +27,17 @@ namespace streamcache {
     }
 
     void Cache::evictExpired() {
-        auto now = std::chrono::system_clock::now();
+        auto now {std::chrono::system_clock::now()};
         
         while (!m_evictionQueue.empty() && m_evictionQueue.top().first < now) {
-            std::pair<TimePoint, std::string> topEntry = m_evictionQueue.top();
-            auto expirationTime = topEntry.first;
-            auto key = topEntry.second;
+            std::pair<TimePoint, std::string> topEntry {m_evictionQueue.top()};
+            auto expirationTime {topEntry.first};
+            auto key {topEntry.second};
             
-            auto it = m_cache.find(key);
+            auto it {m_cache.find(key)};
             
             if (it != m_cache.end()) {
-                const auto& cacheEntry = it->second;
+                const auto& cacheEntry {it->second};
                 
                 /*
                 * Remove the entry from the cache if it matches the expiration time.
