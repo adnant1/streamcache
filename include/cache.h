@@ -55,6 +55,11 @@ namespace streamcache {
             */
            std::optional<std::string> get(const std::string& key);
 
+            /*
+            * Removes expired entries from the cache based on the eviction queue.
+            */
+           void evictExpired();
+
         private:
             std::unordered_map<std::string, CacheEntry> m_cache;
             std::priority_queue<
