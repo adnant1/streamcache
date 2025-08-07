@@ -22,11 +22,6 @@ namespace streamcache {
             const auto& entry = it->second;
             auto now = std::chrono::system_clock::now();
 
-            if(entry.expiration && entry.expiration.value() < now) {
-                m_cache.erase(it);
-                return std::nullopt;
-            }
-
             return entry.value;
         }
 
