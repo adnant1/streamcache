@@ -5,23 +5,25 @@
 namespace streamcache {
 
     bool Cache::empty() const {
-        return cache.empty();
+        return m_cache.empty();
     }
 
     void Cache::set(const std::string& key, const CacheEntry& entry) {
-        cache[key] = entry;
+        m_cache[key] = entry;
     }
 
     std::optional<std::string> Cache::get(const std::string& key) {
-        if (cache.find(key) != cache.end()) {
-            const auto& entry = cache.at(key);
+        auto it = m_cache.find(key);
+        if (it != m_cache.end()) {
+            const auto& entry = it->second;
             auto now = std::chrono::system_clock::now();
-            if (entry.expiration && entry.expiration.value() < now) {
-                cache.erase(key);
+
+            if(entry.expiration && entry.expiration.value() < now) {
+                m_cache.erase(it);
                 return std::nullopt;
-            } else {
-                return entry.value;
             }
+
+            return entry.value;
         }
 
         return std::nullopt;
