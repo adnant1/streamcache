@@ -15,9 +15,6 @@ namespace streamcache {
     };
 
     class Cache {
-        private:
-            std::unordered_map<std::string, CacheEntry> cache;
-       
         public:
             /*
             * Checks if the cache is empty.
@@ -41,5 +38,9 @@ namespace streamcache {
             * @return The value associated with the key, or NULL if not found.
             */
            std::optional<std::string> get(const std::string& key);
+
+        private:
+            std::unordered_map<std::string, CacheEntry> m_cache;
+       
     };
 }
