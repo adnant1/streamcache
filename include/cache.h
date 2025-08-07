@@ -1,17 +1,32 @@
 #pragma once
 #include <string>
 #include <unordered_map>
+#include <queue>    
+#include <vector>
+#include <utility>
 #include <optional>
 #include <chrono>
 
 namespace streamcache {
+    using TimePoint = std::chrono::system_clock::time_point;
 
     /*
     * Entry structure containing a value and relevent metadata.
     */
     struct CacheEntry {
         std::string value;
-        std::optional<std::chrono::system_clock::time_point> expiration;
+        std::optional<TimePoint> expiration;
+    };
+
+    /*
+    * Custom comparator for the eviction queue. Makes sure that keys with earlier
+    * expiration times are prioritized for removal.
+    */
+   struct EvictionComparator {
+        bool operator() (const std::pair<TimePoint, std::string>& a,
+                        const std::pair<TimePoint, std::string>& b) const {
+            return a.first > b.first; // earlier expiration  => higher priority
+        }
     };
 
     class Cache {
@@ -41,6 +56,11 @@ namespace streamcache {
 
         private:
             std::unordered_map<std::string, CacheEntry> m_cache;
+            std::priority_queue<
+                std::pair<TimePoint, std::string>,
+                std::vector<std::pair<TimePoint, std::string>>,
+                EvictionComparator
+            > m_evictionQueue;
        
     };
 }
