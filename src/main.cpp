@@ -13,6 +13,7 @@ int main() {
     streamcache::Cache cache;
 
     while(true) {
+        cache.evictExpired();
         std::cout << "> " << std::flush;
 
         std::string input{};
