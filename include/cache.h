@@ -32,13 +32,6 @@ namespace streamcache {
     class Cache {
         public:
             /**
-            * Checks if the cache is empty.
-            *
-            * @return True if the cache is empty, false otherwise.
-            */
-           bool empty() const;
-
-            /**
             * Adds or updates an entry in the cache.
             * If the entry has an expiration time, it is added to the eviction queue.
             *

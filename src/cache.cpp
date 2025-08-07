@@ -4,10 +4,6 @@
 
 namespace streamcache {
 
-    bool Cache::empty() const {
-        return m_cache.empty();
-    }
-
     void Cache::set(const std::string& key, const CacheEntry& entry) {
         m_cache[key] = entry;
 
