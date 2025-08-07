@@ -40,6 +40,7 @@ namespace streamcache {
 
             /*
             * Adds or updates an entry in the cache.
+            * If the entry has an expiration time, it is added to the eviction queue.
             *
             * @param key The key for the cache entry.
             * @param entry The value + metadata to be stored in the cache.

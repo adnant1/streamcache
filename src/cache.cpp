@@ -10,6 +10,10 @@ namespace streamcache {
 
     void Cache::set(const std::string& key, const CacheEntry& entry) {
         m_cache[key] = entry;
+
+        if (entry.expiration) {
+            m_evictionQueue.push({entry.expiration.value(), key});
+        }
     }
 
     std::optional<std::string> Cache::get(const std::string& key) {
