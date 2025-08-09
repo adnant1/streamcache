@@ -5,13 +5,27 @@
 
 namespace streamcache {
 
-    void Cache::set(const std::string& key, const CacheEntry& entry) {
+    void Cache::set(const std::string& key, CacheEntry entry) {
+        auto now {std::chrono::steady_clock::now()};
+        
+        /*
+        * If the entry has no expiration, but the key already exists with an expiration,
+        * we preserve the existing expiration time.
+        */
+        auto existingIt {m_cache.find(key)};
+        if (!entry.expiration && existingIt != m_cache.end()
+            && existingIt->second.expiration) {
+
+                entry.expiration = existingIt->second.expiration;
+        }
+        
+        entry.timeSet = now;
         m_cache[key] = entry;
+        
         if (entry.expiration) {
             m_evictionQueue.push({entry.expiration.value(), key});
         }
 
-        auto now {std::chrono::steady_clock::now()};
         m_logs[key].push_back({now, entry.value});
     }
 

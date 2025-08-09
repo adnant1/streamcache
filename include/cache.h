@@ -47,8 +47,10 @@ namespace streamcache {
             *
             * @param key The key for the cache entry.
             * @param entry The value + metadata to be stored in the cache.
+            *              Passed by value so it can be safely modified without affecting
+            *              the caller's original object.
             */
-           void set(const std::string& key, const CacheEntry& entry);
+           void set(const std::string& key, CacheEntry entry);
 
             /**
             * Retrieves a value from the cache.
