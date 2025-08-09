@@ -52,4 +52,11 @@ namespace streamcache {
             m_evictionQueue.pop();
         }
     }
+
+    void Cache::pruneLog(const std::string& key, Timestamp cutoff) {
+        auto& log {m_logs[key]};
+        while (!log.empty() && log.front().timestamp < cutoff) {
+            log.pop_front();
+        }
+    }
 }

@@ -62,6 +62,15 @@ namespace streamcache {
             */
            void evictExpired();
 
+           /**
+            * Makes sure that the key's log only contains entries still inside the key's
+            * original TTL window.
+            * 
+            * @param key The key for which the log should be pruned.
+            * @param cutoff The timestamp before which all log entries should be removed.
+            */
+           void pruneLog(const std::string& key, Timestamp cutoff);
+
         private:
             std::unordered_map<std::string, CacheEntry> m_cache {};
             std::priority_queue<
