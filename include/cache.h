@@ -68,7 +68,7 @@ namespace streamcache {
                 std::vector<std::pair<TimePoint, std::string>>,
                 EvictionComparator
             > m_evictionQueue {};
-            std::unordered_map<std::string, std::vector<LogEntry>> m_logs {};
+            std::unordered_map<std::string, std::deque<LogEntry>> m_logs {};
        
     };
 }
