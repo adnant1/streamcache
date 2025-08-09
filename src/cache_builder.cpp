@@ -9,6 +9,7 @@ namespace cache_builder {
 
         streamcache::CacheEntry entry {};
         entry.value = tokens[2];
+        entry.timeSet = std::chrono::steady_clock::now();
 
         /*
         * Optional metadata handling can be added here

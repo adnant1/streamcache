@@ -16,6 +16,7 @@ namespace streamcache {
     struct CacheEntry {
         std::string value {};
         std::optional<Timestamp> expiration {};
+        Timestamp timeSet {};
     };
 
     /*
