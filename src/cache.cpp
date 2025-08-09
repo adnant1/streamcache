@@ -70,17 +70,16 @@ namespace streamcache {
 
         const auto& entry {it->second};
         if (entry.expiration) {
-            auto expirationTime {entry.expiration.value()};
-            auto now {std::chrono::steady_clock::now()};
-            auto ttlDuration {expirationTime - now}; // This gives us the remaining TTL
-            auto cutoff {now - ttlDuration}; // Go back by the TTL duration from now
+            auto originalTTL {entry.expiration.value() - entry.timeSet};
+            auto cutoff {std::chrono::steady_clock::now() - originalTTL};
             pruneLog(key, cutoff);
         }
 
+        // Convert steady_clock timestamp to system_clock for display
+        auto sysNow = std::chrono::system_clock::now();
+        auto steadyNow = std::chrono::steady_clock::now();
+
         for (const auto& logEntry : m_logs.at(key)) {
-            // Convert steady_clock timestamp to system_clock for display
-            auto sysNow = std::chrono::system_clock::now();
-            auto steadyNow = std::chrono::steady_clock::now();
             
             // Explicitly cast the duration to system_clock duration
             auto duration = std::chrono::duration_cast<std::chrono::system_clock::duration>(
