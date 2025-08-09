@@ -68,11 +68,20 @@ namespace streamcache {
             return;
         }
 
+        /*
+        * Use original TTL (expiration - timeSet) to create a fixed replay window.
+        */
         const auto& entry {it->second};
         if (entry.expiration) {
             auto originalTTL {entry.expiration.value() - entry.timeSet};
             auto cutoff {std::chrono::steady_clock::now() - originalTTL};
             pruneLog(key, cutoff);
+        }
+
+        auto lit {m_logs.find(key)};
+        if (lit == m_logs.end() || lit->second.empty()) {
+            std::cout << "No recent history for key: " << key << "\n";
+            return;
         }
 
         // Convert steady_clock timestamp to system_clock for display
