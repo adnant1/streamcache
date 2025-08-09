@@ -19,6 +19,14 @@ namespace streamcache {
     };
 
     /*
+    * Log structure containing the value and its timestamp.
+    */
+   struct LogEntry {
+        TimePoint timestamp {};
+        std::string value {};
+   };
+
+    /*
     * Custom comparator for the eviction queue. Makes sure that keys with earlier
     * expiration times are prioritized for removal.
     */
@@ -60,6 +68,7 @@ namespace streamcache {
                 std::vector<std::pair<TimePoint, std::string>>,
                 EvictionComparator
             > m_evictionQueue {};
+            std::unordered_map<std::string, std::vector<LogEntry>> m_logs {};
        
     };
 }
