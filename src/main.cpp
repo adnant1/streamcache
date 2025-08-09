@@ -51,7 +51,12 @@ int main() {
             }
 
         } else if (tokens[0] == "REPLAY") {
-            std::cout << "Replay functionality not implemented yet.\n";
+            if (tokens.size() != 2) {
+                std::cout << "Usaged: REPLAY <key>\n";
+                continue;
+            }
+
+            cache.replay(tokens[1]);
 
         } else {
             std::cout << "Invalid command: " << tokens[0] << "\n";
