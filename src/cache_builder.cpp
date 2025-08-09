@@ -21,7 +21,7 @@ namespace cache_builder {
                     return std::nullopt;
                 }
 
-                entry.expiration = std::chrono::system_clock::now() + std::chrono::seconds(ttl);
+                entry.expiration = std::chrono::steady_clock::now() + std::chrono::seconds(ttl);
             } catch (const std::exception&) {
                 return std::nullopt;
             }
