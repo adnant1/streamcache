@@ -8,21 +8,21 @@
 #include <chrono>
 
 namespace streamcache {
-    using TimePoint = std::chrono::system_clock::time_point;
+    using Timestamp = std::chrono::steady_clock::time_point;
 
     /*
     * Entry structure containing a value and relevent metadata.
     */
     struct CacheEntry {
         std::string value {};
-        std::optional<TimePoint> expiration {};
+        std::optional<Timestamp> expiration {};
     };
 
     /*
     * Log structure containing the value and its timestamp.
     */
    struct LogEntry {
-        TimePoint timestamp {};
+        Timestamp timestamp {};
         std::string value {};
    };
 
@@ -31,8 +31,8 @@ namespace streamcache {
     * expiration times are prioritized for removal.
     */
    struct EvictionComparator {
-        bool operator() (const std::pair<TimePoint, std::string>& a,
-                        const std::pair<TimePoint, std::string>& b) const {
+        bool operator() (const std::pair<Timestamp, std::string>& a,
+                        const std::pair<Timestamp, std::string>& b) const {
             return a.first > b.first; // earlier expiration  => higher priority
         }
     };
@@ -65,8 +65,8 @@ namespace streamcache {
         private:
             std::unordered_map<std::string, CacheEntry> m_cache {};
             std::priority_queue<
-                std::pair<TimePoint, std::string>,
-                std::vector<std::pair<TimePoint, std::string>>,
+                std::pair<Timestamp, std::string>,
+                std::vector<std::pair<Timestamp, std::string>>,
                 EvictionComparator
             > m_evictionQueue {};
             std::unordered_map<std::string, std::deque<LogEntry>> m_logs {};

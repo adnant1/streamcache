@@ -10,7 +10,7 @@ namespace streamcache {
             m_evictionQueue.push({entry.expiration.value(), key});
         }
 
-        auto now {std::chrono::system_clock::now()};
+        auto now {std::chrono::steady_clock::now()};
         m_logs[key].push_back({now, entry.value});
     }
 
@@ -25,10 +25,10 @@ namespace streamcache {
     }
 
     void Cache::evictExpired() {
-        auto now {std::chrono::system_clock::now()};
+        auto now {std::chrono::steady_clock::now()};
         
         while (!m_evictionQueue.empty() && m_evictionQueue.top().first < now) {
-            std::pair<TimePoint, std::string> topEntry {m_evictionQueue.top()};
+            std::pair<Timestamp, std::string> topEntry {m_evictionQueue.top()};
             auto expirationTime {topEntry.first};
             auto key {topEntry.second};
             
