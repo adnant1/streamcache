@@ -88,7 +88,7 @@ namespace streamcache {
         auto sysNow = std::chrono::system_clock::now();
         auto steadyNow = std::chrono::steady_clock::now();
 
-        for (const auto& logEntry : m_logs.at(key)) {
+        for (const auto& logEntry : lit->second) {
             
             // Explicitly cast the duration to system_clock duration
             auto duration = std::chrono::duration_cast<std::chrono::system_clock::duration>(
