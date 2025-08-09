@@ -66,15 +66,6 @@ namespace streamcache {
            void evictExpired();
 
            /**
-            * Makes sure that the key's log only contains entries still inside the key's
-            * original TTL window.
-            * 
-            * @param key The key for which the log should be pruned.
-            * @param cutoff The timestamp before which all log entries should be removed.
-            */
-           void pruneLog(const std::string& key, Timestamp cutoff);
-
-           /**
             * Displays a key's recent values within its TTL window.
             * 
             * @param key The key for which the log should be displayed.
@@ -89,6 +80,15 @@ namespace streamcache {
                 EvictionComparator
             > m_evictionQueue {};
             std::unordered_map<std::string, std::deque<LogEntry>> m_logs {};
+
+            /**
+            * Makes sure that the key's log only contains entries still inside the key's
+            * original TTL window.
+            * 
+            * @param key The key for which the log should be pruned.
+            * @param cutoff The timestamp before which all log entries should be removed.
+            */
+           void pruneLog(const std::string& key, Timestamp cutoff);
        
     };
 }
