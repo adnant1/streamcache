@@ -1,6 +1,7 @@
 #include "cache.h"
-#include <string>
-#include <unordered_map>
+#include <iostream>
+#include <iomanip>
+
 
 namespace streamcache {
 
@@ -57,6 +58,41 @@ namespace streamcache {
         auto& log {m_logs[key]};
         while (!log.empty() && log.front().timestamp < cutoff) {
             log.pop_front();
+        }
+    }
+
+    void Cache::replay(const std::string& key) {
+        auto it {m_cache.find(key)};
+        if (it == m_cache.end()) {
+            std::cout << "Key not found.\n";
+            return;
+        }
+
+        const auto& entry {it->second};
+        if (entry.expiration) {
+            auto expirationTime {entry.expiration.value()};
+            auto now {std::chrono::steady_clock::now()};
+            auto ttlDuration {expirationTime - now}; // This gives us the remaining TTL
+            auto cutoff {now - ttlDuration}; // Go back by the TTL duration from now
+            pruneLog(key, cutoff);
+        }
+
+        for (const auto& logEntry : m_logs.at(key)) {
+            // Convert steady_clock timestamp to system_clock for display
+            auto sysNow = std::chrono::system_clock::now();
+            auto steadyNow = std::chrono::steady_clock::now();
+            
+            // Explicitly cast the duration to system_clock duration
+            auto duration = std::chrono::duration_cast<std::chrono::system_clock::duration>(
+                logEntry.timestamp - steadyNow
+            );
+            auto sysTime = sysNow + duration;
+
+            std::time_t t = std::chrono::system_clock::to_time_t(sysTime);
+
+            // Format time as YYYY-MM-DD HH:MM:SS
+            std::cout << "[" << std::put_time(std::localtime(&t), "%F %T") << "] "
+                    << logEntry.value << "\n";
         }
     }
 }

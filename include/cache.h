@@ -71,6 +71,13 @@ namespace streamcache {
             */
            void pruneLog(const std::string& key, Timestamp cutoff);
 
+           /**
+            * Displays a key's recent values within its TTL window.
+            * 
+            * @param key The key for which the log should be displayed.
+            */
+           void replay(const std::string& key);
+
         private:
             std::unordered_map<std::string, CacheEntry> m_cache {};
             std::priority_queue<
