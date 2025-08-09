@@ -43,6 +43,7 @@ namespace streamcache {
                 */
                 if (cacheEntry.expiration && cacheEntry.expiration.value() == expirationTime) {
                     m_cache.erase(it);
+                    m_logs.erase(key);
                 }
                 
             }
