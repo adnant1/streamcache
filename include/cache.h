@@ -60,17 +60,40 @@ namespace streamcache {
             */
            std::optional<std::string> get(const std::string& key);
 
-            /**
-            * Removes expired entries from the cache based on the eviction queue.
-            */
-           void evictExpired();
-
            /**
             * Displays a key's recent values within its TTL window.
             * 
             * @param key The key for which the log should be displayed.
             */
            void replay(const std::string& key);
+
+           /**
+            * Called by the eviction thread to check when the next eviction should occur.
+            * Requires a shared lock to safely read the eviction queue without blocking
+            * other readers.
+            * 
+            * @return The timestamp of the next scheduled eviction, or nullopt if no evictions are scheduled.
+            */
+           std::optional<Timestamp> peekNextExpiry() const;
+
+           /**
+            * Removes all keys from the cache whose expiry time is <= @param now.
+            * Called by the eviction thread when it wakes up.
+            * 
+            * @param now The cutoff timestamp.
+            * 
+            * @return The number of entries evicted. Used for metrics.
+            */
+            size_t evictExpired(Timestamp now);
+
+            /**
+             * Lets the eviction thread know that a new entry with an earlier expiry time
+             * has been added to the cache. This allows the eviction thread to wake up
+             * earlier if needed. Called by SET immediately after adding a new entry.
+             * 
+             * @param t The new earliest expiry time.
+             */
+            void notifyNewExpiry(Timestamp t);
 
         private:
             std::unordered_map<std::string, CacheEntry> m_cache {};
