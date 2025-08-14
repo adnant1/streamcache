@@ -5,7 +5,7 @@
 #include <chrono>
 #include "cache.h"
 
-namespace cache_builder {
+namespace {
 
     /**
      * Builds a cache entry from the given vector of tokens.

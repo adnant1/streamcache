@@ -45,7 +45,7 @@ int main() {
                 break;
 
             case Command::SET: {
-                auto entry {cache_builder::buildCacheEntry(tokens)};
+                auto entry {buildCacheEntry(tokens)};
                 if (!entry) {
                     std::cout << "Usage: SET <key> <value> <metadata>\n";
                     continue;
