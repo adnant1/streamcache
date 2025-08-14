@@ -79,6 +79,7 @@ namespace streamcache {
            /**
             * Removes all keys from the cache whose expiry time is <= @param now.
             * Called by the eviction thread when it wakes up.
+            * Requires an exclusive lock to safely modify the cache and eviction heap.
             * 
             * @param now The cutoff timestamp.
             * 
@@ -90,6 +91,7 @@ namespace streamcache {
             * Compares the new expiry time against the current earliest expiry in the heap.
             * If the new time is earlier (or if there were no expiring keys before), signals
             * the eviction thread to recalculate its wakeup deadline.
+            * Uses minimal locking; never blocks on the eviction thread.
             * 
             * @param t The new earliest expiry time.
             */
