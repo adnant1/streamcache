@@ -42,7 +42,7 @@ namespace streamcache {
         public:
             /**
             * Adds or updates an entry in the cache.
-            * If the entry has an expiration time, it is added to the eviction queue.
+            * If the entry has an expiration time, it is added to the eviction heap.
             * Appends the value to the key's log.
             *
             * @param key The key for the cache entry.
@@ -69,7 +69,7 @@ namespace streamcache {
 
            /**
             * Called by the eviction thread to check when the next eviction should occur.
-            * Requires a shared lock to safely read the eviction queue without blocking
+            * Requires a shared lock to safely read the eviction heap without blocking
             * other readers.
             * 
             * @return The timestamp of the next scheduled eviction, or nullopt if no evictions are scheduled.
@@ -101,7 +101,7 @@ namespace streamcache {
                 std::pair<Timestamp, std::string>,
                 std::vector<std::pair<Timestamp, std::string>>,
                 EvictionComparator
-            > m_evictionQueue {};
+            > m_evictionHeap {};
             std::unordered_map<std::string, std::deque<LogEntry>> m_logs {};
 
             std::atomic<size_t> m_evictionsTotal {0};

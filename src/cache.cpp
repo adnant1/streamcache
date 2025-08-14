@@ -23,7 +23,7 @@ namespace streamcache {
         m_cache[key] = entry;
         
         if (entry.expiration) {
-            m_evictionQueue.push({entry.expiration.value(), key});
+            m_evictionHeap.push({entry.expiration.value(), key});
         }
 
         m_logs[key].push_back({now, entry.value});
@@ -42,8 +42,8 @@ namespace streamcache {
     void Cache::evictExpired() {
         auto now {std::chrono::steady_clock::now()};
         
-        while (!m_evictionQueue.empty() && m_evictionQueue.top().first < now) {
-            std::pair<Timestamp, std::string> topEntry {m_evictionQueue.top()};
+        while (!m_evictionHeap.empty() && m_evictionHeap.top().first < now) {
+            std::pair<Timestamp, std::string> topEntry {m_evictionHeap.top()};
             auto expirationTime {topEntry.first};
             auto key {topEntry.second};
             
@@ -65,7 +65,7 @@ namespace streamcache {
             /*
             * If the key isn't found or the expiration time doesn't match, it's a stale entry and should be popped from the queue.
             */
-            m_evictionQueue.pop();
+            m_evictionHeap.pop();
         }
     }
 
