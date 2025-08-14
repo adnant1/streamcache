@@ -104,6 +104,11 @@ namespace streamcache {
             > m_evictionQueue {};
             std::unordered_map<std::string, std::deque<LogEntry>> m_logs {};
 
+            std::atomic<size_t> m_evictionsTotal {0};
+            std::atomic<size_t> m_evictionBatches {0};
+            std::atomic<size_t> m_heapSize {0};
+            std::atomic<size_t> m_notifyEalierExpiryCount {0};
+
             /**
             * Makes sure that the key's log only contains entries still inside the key's
             * original TTL window.
