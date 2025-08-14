@@ -87,12 +87,12 @@ namespace streamcache {
             size_t evictExpired(Timestamp now);
 
             /**
-             * Lets the eviction thread know that a new entry with an earlier expiry time
-             * has been added to the cache. This allows the eviction thread to wake up
-             * earlier if needed. Called by SET immediately after adding a new entry.
-             * 
-             * @param t The new earliest expiry time.
-             */
+            * Compares the new expiry time against the current earliest expiry in the heap.
+            * If the new time is earlier (or if there were no expiring keys before), signals
+            * the eviction thread to recalculate its wakeup deadline.
+            * 
+            * @param t The new earliest expiry time.
+            */
             void notifyNewExpiry(Timestamp t);
 
         private:
