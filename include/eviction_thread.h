@@ -59,6 +59,13 @@ namespace streamcache {
             std::condition_variable_any m_cv;
             std::mutex m_cvMutex;
             Cache* m_cache {nullptr};
+
+            /**
+             * Main loop for the eviction thread.
+             * Waits until the next scheduled expiry or until notified of an earlier one,
+             * then evicts expired entries in batches until none are due.
+             */
+            void runLoop();
     };
 
 }
