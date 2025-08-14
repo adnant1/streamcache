@@ -97,6 +97,26 @@ namespace streamcache {
             */
             void notifyNewExpiry(Timestamp t);
 
+            /**
+            * @return Total number of keys evicted due to expiry since startup.
+            */
+            size_t getEvictionsTotal() const noexcept { return m_evictionsTotal.load(); }
+
+            /**
+            * @return Total number of eviction cycles (wakeups that resulted in evictions).
+            */
+            size_t getEvictionBatches() const noexcept { return m_evictionBatches.load(); }
+
+            /**
+            * @return Current number of entries in the eviction queue.
+            */
+            size_t getHeapSize() const noexcept { return m_heapSize.load(); }
+
+            /**
+            * @return How many times an earlier expiry triggered a wakeup.
+            */
+            size_t getNotifyEarlierDeadlineCount() const noexcept { return m_notifyEarlierExpiryCount.load(); }
+
         private:
             std::unordered_map<std::string, CacheEntry> m_cache {};
             std::priority_queue<
@@ -109,7 +129,7 @@ namespace streamcache {
             std::atomic<size_t> m_evictionsTotal {0};
             std::atomic<size_t> m_evictionBatches {0};
             std::atomic<size_t> m_heapSize {0};
-            std::atomic<size_t> m_notifyEalierExpiryCount {0};
+            std::atomic<size_t> m_notifyEarlierExpiryCount {0};
 
             /**
             * Makes sure that the key's log only contains entries still inside the key's
