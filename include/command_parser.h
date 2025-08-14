@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-namespace command_parser {
+namespace {
     /**
      * Parses a command string into a vector of tokens.
      *

@@ -35,7 +35,7 @@ int main() {
         std::string input {};
         std::getline(std::cin, input);
 
-        auto tokens {command_parser::parse(input)};
+        auto tokens {parse(input)};
         if (tokens.empty()) {
             continue;
         }       
