@@ -39,12 +39,14 @@ namespace streamcache {
         return std::nullopt;
     }
 
-    void Cache::evictExpired() {
-        auto now {std::chrono::steady_clock::now()};
+    size_t Cache::evictExpired(Timestamp now) {
+        size_t evictedCount {0};
+        std::unique_lock<std::shared_mutex> lock(m_mutex);
+        bool batchEvicted {false};
         
-        while (!m_evictionHeap.empty() && m_evictionHeap.top().first < now) {
+        while (!m_evictionHeap.empty() && m_evictionHeap.top().first <= now) {
             std::pair<Timestamp, std::string> topEntry {m_evictionHeap.top()};
-            auto expirationTime {topEntry.first};
+            auto expiry {topEntry.first};
             auto key {topEntry.second};
             
             auto it {m_cache.find(key)};
@@ -55,9 +57,11 @@ namespace streamcache {
                 /*
                 * Remove the entry from the cache if it matches the expiration time.
                 */
-                if (cacheEntry.expiration && cacheEntry.expiration.value() == expirationTime) {
+                if (cacheEntry.expiration && cacheEntry.expiration.value() == expiry) {
                     m_cache.erase(it);
                     m_logs.erase(key);
+                    ++evictedCount;
+                    batchEvicted = true;
                 }
                 
             }
@@ -67,6 +71,13 @@ namespace streamcache {
             */
             m_evictionHeap.pop();
         }
+
+        if (batchEvicted) {
+            ++m_evictionBatches;
+        }
+        m_evictionsTotal += evictedCount;
+        m_heapSize = m_evictionHeap.size();
+        return evictedCount;
     }
 
     void Cache::pruneLog(const std::string& key, Timestamp cutoff) {
