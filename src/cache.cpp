@@ -139,4 +139,23 @@ namespace streamcache {
 
         return m_evictionHeap.top().first;
     }
+
+    void Cache::notifyNewExpiry(Timestamp t) {
+        bool shouldNotify {false};
+        {
+            std::shared_lock lock(m_mutex);
+            const bool earlier {
+                m_evictionHeap.empty() || t < m_evictionHeap.top().first
+            };
+
+            if (earlier) {
+                ++m_notifyEarlierExpiryCount;
+                shouldNotify = true;
+            }
+        }
+
+        if (shouldNotify && m_notifyWakeup) {
+            m_notifyWakeup();
+        }
+    }
 }
