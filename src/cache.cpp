@@ -118,4 +118,14 @@ namespace streamcache {
                     << logEntry.value << "\n";
         }
     }
+
+    std::optional<Timestamp> Cache::peekNextExpiry() const {
+        std::shared_lock lock(m_mutex);
+        
+        if (m_evictionHeap.empty()) {
+            return std::nullopt;
+        }
+
+        return m_evictionHeap.top().first;
+    }
 }
