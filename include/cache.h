@@ -6,6 +6,7 @@
 #include <utility>
 #include <optional>
 #include <chrono>
+#include <shared_mutex>
 
 namespace streamcache {
     using Timestamp = std::chrono::steady_clock::time_point;
@@ -125,6 +126,7 @@ namespace streamcache {
                 EvictionComparator
             > m_evictionHeap {};
             std::unordered_map<std::string, std::deque<LogEntry>> m_logs {};
+            mutable std::shared_mutex m_mutex {};
 
             std::atomic<size_t> m_evictionsTotal {0};
             std::atomic<size_t> m_evictionBatches {0};
