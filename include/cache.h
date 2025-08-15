@@ -99,6 +99,13 @@ namespace streamcache {
             void notifyNewExpiry(Timestamp t);
 
             /**
+            * Gives the eviction thread a way to register the wakeup function.
+            * 
+            * @param cb The callback to call when the eviction thread needs to wake up.
+            */
+            void setNotifyWakeup(std::function<void()> cb) { m_notifyWakeup = std::move(cb); }
+
+            /**
             * @return Total number of keys evicted due to expiry since startup.
             */
             size_t getEvictionsTotal() const noexcept { return m_evictionsTotal.load(); }
@@ -126,6 +133,7 @@ namespace streamcache {
                 EvictionComparator
             > m_evictionHeap {};
             std::unordered_map<std::string, std::deque<LogEntry>> m_logs {};
+            std::function<void()> m_notifyWakeup {};
             mutable std::shared_mutex m_mutex {};
 
             std::atomic<size_t> m_evictionsTotal {0};
