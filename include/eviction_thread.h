@@ -2,6 +2,8 @@
 #include "cache.h"
 #include <thread>
 #include <condition_variable>
+#include <atomic>
+#include <mutex>
 
 namespace streamcache {
     
