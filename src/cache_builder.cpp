@@ -1,6 +1,6 @@
 #include "cache_builder.h"
 
-namespace cache_builder {
+namespace {
 
     std::optional<streamcache::CacheEntry> buildCacheEntry(const std::vector<std::string>& tokens) {
         if (tokens.size() < 3) {

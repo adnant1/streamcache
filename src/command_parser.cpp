@@ -3,7 +3,7 @@
 #include <vector>
 #include <sstream>
 
-namespace command_parser {
+namespace {
 
     std::vector<std::string> parse(const std::string& input) {
         std::vector<std::string> tokens {};
