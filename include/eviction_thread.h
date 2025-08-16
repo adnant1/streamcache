@@ -56,8 +56,8 @@ namespace streamcache {
         private:
             std::thread m_thread;
             std::atomic<bool> m_running {false};
-            std::condition_variable_any m_cv;
-            std::mutex m_cvMutex;
+            std::condition_variable_any m_cv {};
+            std::mutex m_cvMutex {};
             Cache* m_cache {nullptr};
 
             /**
