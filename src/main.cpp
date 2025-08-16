@@ -37,7 +37,7 @@ int main() {
         std::string input {};
         std::getline(std::cin, input);
 
-        auto tokens {parse(input)};
+        auto tokens {util::parse(input)};
         if (tokens.empty()) {
             continue;
         }       
@@ -47,7 +47,7 @@ int main() {
                 break;
 
             case Command::SET: {
-                auto entry {buildCacheEntry(tokens)};
+                auto entry {util::buildCacheEntry(tokens)};
                 if (!entry) {
                     std::cout << "Usage: SET <key> <value> <metadata>\n";
                     continue;

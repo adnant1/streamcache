@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-namespace {
+namespace util {
     /**
      * Parses a command string into a vector of tokens.
      *
