@@ -5,6 +5,7 @@
 #include "command_parser.h"
 #include "cache_builder.h"
 #include "cache.h"
+#include "eviction_thread.h"
 
 enum class Command {
     EXIT,
@@ -27,9 +28,10 @@ Command getCommand(const std::string& cmd) {
  */
 int main() {
     streamcache::Cache cache {};
+    streamcache::EvictionThread evictionThread {};
+    evictionThread.start(cache);
 
     while(true) {
-        cache.evictExpired();
         std::cout << "> " << std::flush;
 
         std::string input {};
@@ -90,5 +92,6 @@ int main() {
         }
     }
 
+    evictionThread.stop();
     return 0;
 }
