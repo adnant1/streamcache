@@ -7,26 +7,40 @@ namespace streamcache {
 
     void Cache::set(const std::string& key, CacheEntry entry) {
         auto now {std::chrono::steady_clock::now()};
-        
-        /*
-        * If the entry has no expiration, but the key already exists with an expiration,
-        * we preserve the existing expiration time.
-        */
-        auto existingIt {m_cache.find(key)};
-        if (!entry.expiration && existingIt != m_cache.end()
-            && existingIt->second.expiration) {
 
-                entry.expiration = existingIt->second.expiration;
+        // Decide after unlocking whether to notify the eviction thread
+        std::optional<Timestamp> notifyAt;
+
+        {
+            std::unique_lock<std::shared_mutex> lock(m_mutex);
+            
+            /*
+            * If the entry has no expiration, but the key already exists with an expiration,
+            * we preserve the existing expiration time.
+            */
+            auto existingIt {m_cache.find(key)};
+            if (!entry.expiration && existingIt != m_cache.end()
+                && existingIt->second.expiration) {
+    
+                    entry.expiration = existingIt->second.expiration;
+            }
+            
+            entry.timeSet = now;
+            m_cache[key] = entry;
+            
+            if (entry.expiration) {
+                const Timestamp t = *entry.expiration;
+                m_evictionHeap.push({t, key});
+                notifyAt = t;
+                m_heapSize = m_evictionHeap.size();
+            }
+    
+            m_logs[key].push_back({now, entry.value});
         }
         
-        entry.timeSet = now;
-        m_cache[key] = entry;
-        
-        if (entry.expiration) {
-            m_evictionHeap.push({entry.expiration.value(), key});
+        if (notifyAt) {
+            notifyNewExpiry(*notifyAt);
         }
-
-        m_logs[key].push_back({now, entry.value});
     }
 
     std::optional<std::string> Cache::get(const std::string& key) {
