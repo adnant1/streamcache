@@ -1,5 +1,6 @@
 #include "eviction_thread.h"
 #include <cassert>
+#include <chrono>
 
 namespace streamcache {
 
@@ -32,5 +33,50 @@ namespace streamcache {
 
     EvictionThread::~EvictionThread() {
         stop();
+    }
+
+    void EvictionThread::runLoop() {
+        while (m_running.load(std::memory_order_relaxed)) {
+            std::optional<Timestamp> nextExpiry {m_cache->peekNextExpiry()};
+
+            /*
+            * If the time has already reached/passed, don't bother sleeping.
+            * Fall through to shutdown check + eviction below.
+            */
+            if (nextExpiry && std::chrono::steady_clock::now() >= *nextExpiry) {
+
+            } else {
+                // Sleep until a deadline appears or arrives, or until shutdown.
+                {
+                    std::unique_lock<std::mutex> lock(m_cvMutex);
+    
+                    if(!nextExpiry) {
+                        m_cv.wait(lock, [this] {
+                            return !m_running.load(std::memory_order_relaxed) || m_cache->peekNextExpiry().has_value();
+                        });
+                    } else {
+                        const Timestamp deadline {*nextExpiry};
+                        m_cv.wait_until(lock, deadline, [this, deadline] {
+                            return !m_running.load(std::memory_order_relaxed) || std::chrono::steady_clock::now() >= deadline;
+                        });
+                    }
+                }
+            }
+
+            /*
+            * If the thread woke up because a new deadline appeared (no-deadline case),
+            * we don't necessarily want to evict yet. Re-loop to fetch it precisely.
+            */
+           if (!nextExpiry) {
+                continue;
+           }
+
+            if (!m_running.load(std::memory_order_relaxed)) {
+                break;
+            }
+
+            const auto now {std::chrono::steady_clock::now()};
+            m_cache->evictExpired(now);
+        }
     }
 }
