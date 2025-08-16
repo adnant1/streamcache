@@ -29,4 +29,8 @@ namespace streamcache {
             m_thread.join();
         }
     }
+
+    EvictionThread::~EvictionThread() {
+        stop();
+    }
 }
