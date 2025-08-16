@@ -17,4 +17,16 @@ namespace streamcache {
         m_running.store(true, std::memory_order_relaxed);
         m_thread = std::thread(&EvictionThread::runLoop, this);
     }
+
+    void EvictionThread::stop() {
+        if (!m_running.exchange(false)) {
+            return;
+        }
+
+        m_cv.notify_all();
+
+        if (m_thread.joinable()) {
+            m_thread.join();
+        }
+    }
 }
