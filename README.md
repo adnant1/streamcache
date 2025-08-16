@@ -22,7 +22,8 @@ StreamCache’s architecture supports multiple production-grade scenarios:
 - **SET / GET** — Store and retrieve values by key with low-latency lookups.
 - **TTL support** — Automatic expiration of keys after a defined time.
 - **Min-heap eviction** — Priority-based removal of expired keys with minimal overhead.
-- **REPLAY** — Retrieve historical values for a key from the log.
+- **Background eviction thread** — Proactively evicts expired keys in an event driven manner, so reads/writes don't pay cleanup costs.
+- **REPLAY** — Retrieve historical values for a key in its TTL window from the log.
 - **Append-only log** — Durable in-memory history for every key.
 - **CLI REPL** — Direct, command-line interaction with the engine.
 
@@ -32,8 +33,9 @@ StreamCache’s architecture supports multiple production-grade scenarios:
 
 - **Hash map** — O(1) key lookups.
 - **Min-heap** — Efficiently ordered eviction queue by expiration time.
+- **Background eviction thread** — Dedicated worker thread that proactively evists expired keys.
 - **Append-only log** — Immutable event history per key.
-- **Single-threaded** — Command execution with on-demand eviction.
+- **Multi-threaded** — REPL runs on the main thread, with eviction offloaded to a background worker.
 - **Standard library only** — No external dependencies.
 
 ---
@@ -58,7 +60,7 @@ Value: Brian
 
 ## Upcoming Features
 
-- **Sharding + background eviction + RW locks** — Horizontal scaling and concurrency.
+- **Sharding + RW locks** — Horizontal scaling and concurrency.
 - **Disk AOF + snapshot + recovery** — Persistence and crash recovery.
 - **INFO / metrics + slowlog + SCAN** — Operational visibility and performance monitoring.
 
