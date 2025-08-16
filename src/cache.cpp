@@ -47,6 +47,10 @@ namespace streamcache {
         auto it {m_cache.find(key)};
         if (it != m_cache.end()) {
             const auto& entry {it->second};
+            if (entry.expiration && *entry.expiration <= std::chrono::steady_clock::now()) {
+                // Entry is expired, don't serve it or modify the cache
+                return std::nullopt;
+            }
             return entry.value;
         }
 
