@@ -44,6 +44,8 @@ namespace streamcache {
     }
 
     std::optional<std::string> Cache::get(const std::string& key) {
+        std::shared_lock<std::shared_mutex> lock(m_mutex);
+
         auto it {m_cache.find(key)};
         if (it != m_cache.end()) {
             const auto& entry {it->second};
