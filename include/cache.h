@@ -148,7 +148,7 @@ namespace streamcache {
             * @param key The key for which the log should be pruned.
             * @param cutoff The timestamp before which all log entries should be removed.
             */
-           void pruneLog(const std::string& key, Timestamp now, std::chrono::nanoseconds ttl);
+           void pruneLog(const std::string& key, Timestamp cutoff);
        
     };
 }

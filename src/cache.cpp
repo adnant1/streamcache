@@ -110,14 +110,10 @@ namespace streamcache {
         return evictedCount;
     }
 
-    void Cache::pruneLog(const std::string& key, Timestamp now, std::chrono::nanoseconds ttl) {
+    void Cache::pruneLog(const std::string& key, Timestamp cutoff) {
         auto& log {m_logs[key]};
-        while (!log.empty()) {
-            if (log.front().timestamp + ttl <= now) {
-                log.pop_front();
-            } else{
-                break;
-            }
+        while (!log.empty() && log.front().timestamp < cutoff) {
+            log.pop_front();
         }
     }
 
