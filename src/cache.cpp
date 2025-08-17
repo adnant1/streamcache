@@ -68,7 +68,6 @@ namespace streamcache {
     size_t Cache::evictExpired(Timestamp now) {
         std::vector<std::string> expiredKeys {};
         size_t evictedCount {0};
-        bool batchEvicted {false};
         
         {
             std::unique_lock<std::shared_mutex> lock(m_mutex);
@@ -90,7 +89,6 @@ namespace streamcache {
                         expiredKeys.push_back(key);
                         m_cache.erase(it);
                         ++evictedCount;
-                        batchEvicted = true;
                     }
                     
                 }
@@ -101,12 +99,19 @@ namespace streamcache {
                 m_evictionHeap.pop();
             }
     
-            if (batchEvicted) {
+            if (evictedCount > 0) {
                 ++m_evictionBatches;
             }
             m_evictionsTotal += evictedCount;
             m_heapSize = m_evictionHeap.size();
         }
+
+        /*
+        * Erase the logs outside the lock to avoid holding it for potentially long operations.
+        */
+       for (auto& k: expiredKeys) {
+            m_logs.erase(k);
+       }
 
         return evictedCount;
     }
