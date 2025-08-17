@@ -136,6 +136,12 @@ namespace streamcache {
                 std::cout << "Key not found.\n";
                 return;
             }
+
+            const auto& entry {it->second};
+            if (entry.expiration && *entry.expiration <= std::chrono::steady_clock::now()) {
+                std::cout << "Key is expired.\n";
+                return;
+            }
             
             auto lit {m_logs.find(key)};
             if (lit == m_logs.end() || lit->second.empty()) {
