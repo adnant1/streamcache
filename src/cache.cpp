@@ -118,36 +118,33 @@ namespace streamcache {
     }
 
     void Cache::replay(const std::string& key) {
-        std::deque<LogEntry> logCopy {};
-        {
-            std::shared_lock<std::shared_mutex> lock(m_mutex);
-            
-            auto it {m_cache.find(key)};
-            if (it == m_cache.end()) {
-                std::cout << "Key not found.\n";
-                return;
-            }
+        auto it {m_cache.find(key)};
+        if (it == m_cache.end()) {
+            std::cout << "Key not found.\n";
+            return;
+        }
 
-            const auto& entry {it->second};
-            if (entry.expiration && *entry.expiration <= std::chrono::steady_clock::now()) {
-                std::cout << "Key is expired.\n";
-                return;
-            }
-            
-            auto lit {m_logs.find(key)};
-            if (lit == m_logs.end() || lit->second.empty()) {
-                std::cout << "No recent history for key: " << key << "\n";
-                return;
-            }
+        /*
+        * Use original TTL (expiration - timeSet) to create a fixed replay window.
+        */
+        const auto& entry {it->second};
+        if (entry.expiration) {
+            auto originalTTL {entry.expiration.value() - entry.timeSet};
+            auto cutoff {std::chrono::steady_clock::now() - originalTTL};
+            pruneLog(key, cutoff);
+        }
 
-            logCopy = lit->second; // Copy the log to avoid holding the lock during output
-        }    
+        auto lit {m_logs.find(key)};
+        if (lit == m_logs.end() || lit->second.empty()) {
+            std::cout << "No recent history for key: " << key << "\n";
+            return;
+        }
 
         // Convert steady_clock timestamp to system_clock for display
         auto sysNow = std::chrono::system_clock::now();
         auto steadyNow = std::chrono::steady_clock::now();
 
-        for (const auto& logEntry : logCopy) {
+        for (const auto& logEntry : lit->second) {
             
             // Explicitly cast the duration to system_clock duration
             auto duration = std::chrono::duration_cast<std::chrono::system_clock::duration>(
