@@ -36,11 +36,6 @@ namespace streamcache {
             }
     
             m_logs[key].push_back({now, entry.value});
-
-            if (entry.expiration) {
-                auto ttl {*entry.expiration - entry.timeSet};
-                pruneLog(key, now, ttl);
-            }
         }
         
         if (notifyAt) {
