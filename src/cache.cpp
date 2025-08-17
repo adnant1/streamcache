@@ -66,43 +66,48 @@ namespace streamcache {
     }
 
     size_t Cache::evictExpired(Timestamp now) {
+        std::vector<std::string> expiredKeys {};
         size_t evictedCount {0};
-        std::unique_lock<std::shared_mutex> lock(m_mutex);
         bool batchEvicted {false};
         
-        while (!m_evictionHeap.empty() && m_evictionHeap.top().first <= now) {
-            std::pair<Timestamp, std::string> topEntry {m_evictionHeap.top()};
-            auto expiry {topEntry.first};
-            auto key {topEntry.second};
-            
-            auto it {m_cache.find(key)};
-            
-            if (it != m_cache.end()) {
-                const auto& cacheEntry {it->second};
+        {
+            std::unique_lock<std::shared_mutex> lock(m_mutex);
+
+            while (!m_evictionHeap.empty() && m_evictionHeap.top().first <= now) {
+                std::pair<Timestamp, std::string> topEntry {m_evictionHeap.top()};
+                auto expiry {topEntry.first};
+                auto key {topEntry.second};
                 
-                /*
-                * Remove the entry from the cache if it matches the expiration time.
-                */
-                if (cacheEntry.expiration && cacheEntry.expiration.value() == expiry) {
-                    m_cache.erase(it);
-                    m_logs.erase(key);
-                    ++evictedCount;
-                    batchEvicted = true;
+                auto it {m_cache.find(key)};
+                
+                if (it != m_cache.end()) {
+                    const auto& cacheEntry {it->second};
+                    
+                    /*
+                    * Remove the entry from the cache if it matches the expiration time.
+                    */
+                    if (cacheEntry.expiration && cacheEntry.expiration.value() == expiry) {
+                        expiredKeys.push_back(key);
+                        m_cache.erase(it);
+                        ++evictedCount;
+                        batchEvicted = true;
+                    }
+                    
                 }
                 
+                /*
+                * If the key isn't found or the expiration time doesn't match, it's a stale entry and should be popped from the queue.
+                */
+                m_evictionHeap.pop();
             }
-            
-            /*
-            * If the key isn't found or the expiration time doesn't match, it's a stale entry and should be popped from the queue.
-            */
-            m_evictionHeap.pop();
+    
+            if (batchEvicted) {
+                ++m_evictionBatches;
+            }
+            m_evictionsTotal += evictedCount;
+            m_heapSize = m_evictionHeap.size();
         }
 
-        if (batchEvicted) {
-            ++m_evictionBatches;
-        }
-        m_evictionsTotal += evictedCount;
-        m_heapSize = m_evictionHeap.size();
         return evictedCount;
     }
 
