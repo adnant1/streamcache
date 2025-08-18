@@ -117,6 +117,24 @@ namespace streamcache {
         }
     }
 
+    std::deque<LogEntry> Cache::getLogsForReplay(const std::string& key, Timestamp cutoff) const {
+        std::shared_lock<std::shared_mutex> lock(m_mutex);
+
+        auto lit {m_logs.find(key)};
+        if (lit == m_logs.end()) {
+            return {};
+        }
+
+        std::deque<LogEntry> replayLog {};
+        for (const auto& logEntry: lit->second) {
+            if (logEntry.timestamp >= cutoff) {
+                replayLog.push_back(logEntry);
+            }
+        }
+
+        return replayLog;
+    }
+
     void Cache::replay(const std::string& key) {
         auto it {m_cache.find(key)};
         if (it == m_cache.end()) {

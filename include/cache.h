@@ -149,6 +149,15 @@ namespace streamcache {
             * @param cutoff The timestamp before which all log entries should be removed.
             */
            void pruneLog(const std::string& key, Timestamp cutoff);
+
+           /**
+            * Returns the logs needed for REPLAY for a given key.
+            * Logs are pruned to only include entries within the TTL window.
+            * 
+            * @param key The key for which the logs should be returned.
+            * @return A queue of LogEntry objects representing the key's history.
+            */
+           std::deque<LogEntry> getLogsForReplay(const std::string& key, Timestamp cutoff) const;
        
     };
 }
