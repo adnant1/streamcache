@@ -12,11 +12,16 @@ namespace streamcache {
     * @brief Owns and manages the background eviction thread for a Cache instance.
     *
     * The EvictionThread monitors the earliest expiry in the target cache and
-    * wakes exactly when needed to evict expired entries in batches. It is
-    * designed to be event-driven (not polling) and uses a condition variable
-    * to sleep until either:
+    * wakes exactly when needed to evict expired entries in batches. Additionally,
+    * it maintains log entries by pruning logs older than a fixed retention duration
+    * to prevent unbounded memory growth. It is designed to be event-driven (not 
+    * polling) and uses a condition variable to sleep until either:
     *   1. The next scheduled eviction time is reached.
     *   2. It is notified of an earlier expiry via Cache::notifyNewExpiry().
+    *
+    * On each wake-up cycle, the thread performs:
+    * - Cache eviction: Removes expired cache entries
+    * - Log maintenance: Prunes log entries older than the retention duration
     *
     * Lifecycle:
     * - Call start(Cache&) once to launch the eviction thread.
@@ -26,7 +31,7 @@ namespace streamcache {
     *
     * Thread safety:
     * - The EvictionThread does not modify Cache internals directly; it calls
-    *   public, lock-aware methods on Cache (peekNextExpiry, evictExpired).
+    *   public, lock-aware methods on Cache (peekNextExpiry, evictExpired, pruneAllLogs).
     * - Condition variable mutex is used only for sleep/wake coordination.
     *
     * Typical usage:
