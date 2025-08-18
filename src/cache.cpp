@@ -181,9 +181,16 @@ namespace streamcache {
     void Cache::pruneAllLogs(Timestamp cutoff) {
         std::unique_lock<std::shared_mutex> lock(m_mutex);
 
+        auto startTime = std::chrono::steady_clock::now();
+        const auto MAX_PRUNE_TIME = std::chrono::milliseconds(5);
+
         for (auto& [key, log] : m_logs) {
             while (!log.empty() && log.front().timestamp < cutoff) {
                 log.pop_front();
+            }
+
+            if (std::chrono::steady_clock::now() - startTime > MAX_PRUNE_TIME) {
+                break;
             }
         }
     }
