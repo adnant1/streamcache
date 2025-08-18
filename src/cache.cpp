@@ -110,12 +110,6 @@ namespace streamcache {
         return evictedCount;
     }
 
-    void Cache::pruneLog(const std::string& key, Timestamp cutoff) {
-        auto& log {m_logs[key]};
-        while (!log.empty() && log.front().timestamp < cutoff) {
-            log.pop_front();
-        }
-    }
 
     std::deque<LogEntry> Cache::getLogsForReplay(const std::string& key, Timestamp cutoff) const {
         std::shared_lock<std::shared_mutex> lock(m_mutex);

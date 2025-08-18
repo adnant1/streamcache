@@ -141,15 +141,6 @@ namespace streamcache {
             std::atomic<size_t> m_heapSize {0};
             std::atomic<size_t> m_notifyEarlierExpiryCount {0};
 
-            /**
-            * Makes sure that the key's log only contains entries still inside the key's
-            * original TTL window.
-            * 
-            * @param key The key for which the log should be pruned.
-            * @param cutoff The timestamp before which all log entries should be removed.
-            */
-           void pruneLog(const std::string& key, Timestamp cutoff);
-
            /**
             * Returns the logs needed for REPLAY for a given key.
             * Logs are pruned to only include entries within the TTL window.
