@@ -69,6 +69,16 @@ namespace streamcache {
            void replay(const std::string& key);
 
            /**
+            * Prunes log entries for all keys that are older than the cutoff timestamp.
+            * This cutoff is calculated by (now - log retention duration).
+            * The log retention duration is a fixed value of 1 hour. This means that
+            * logs older than 1 hour will be removed, regardless of the individual key's TTL.
+            * 
+            * @param cutoff The timestamp before which all log entries should be removed.
+            */
+           void pruneAllLogs(Timestamp cutoff);
+
+           /**
             * Called by the eviction thread to check when the next eviction should occur.
             * Requires a shared lock to safely read the eviction heap without blocking
             * other readers.

@@ -178,6 +178,16 @@ namespace streamcache {
         }
     }
 
+    void Cache::pruneAllLogs(Timestamp cutoff) {
+        std::unique_lock<std::shared_mutex> lock(m_mutex);
+
+        for (auto& [key, log] : m_logs) {
+            while (!log.empty() && log.front().timestamp < cutoff) {
+                log.pop_front();
+            }
+        }
+    }
+
     std::optional<Timestamp> Cache::peekNextExpiry() const {
         std::shared_lock lock(m_mutex);
         
