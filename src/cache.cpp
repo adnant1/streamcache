@@ -136,6 +136,8 @@ namespace streamcache {
     }
 
     void Cache::replay(const std::string& key) {
+        std::shared_lock<std::shared_mutex> lock(m_mutex);
+        
         auto it {m_cache.find(key)};
         if (it == m_cache.end()) {
             std::cout << "Key not found.\n";
@@ -146,14 +148,18 @@ namespace streamcache {
         * Use original TTL (expiration - timeSet) to create a fixed replay window.
         */
         const auto& entry {it->second};
+        std::deque<LogEntry> replayLog;
+        
         if (entry.expiration) {
             auto originalTTL {entry.expiration.value() - entry.timeSet};
             auto cutoff {std::chrono::steady_clock::now() - originalTTL};
-            pruneLog(key, cutoff);
+            replayLog = getLogsForReplay(key, cutoff);
+        } else {
+            // No expiration, show all logs
+            replayLog = getLogsForReplay(key, Timestamp{});
         }
 
-        auto lit {m_logs.find(key)};
-        if (lit == m_logs.end() || lit->second.empty()) {
+        if (replayLog.empty()) {
             std::cout << "No recent history for key: " << key << "\n";
             return;
         }
@@ -162,7 +168,7 @@ namespace streamcache {
         auto sysNow = std::chrono::system_clock::now();
         auto steadyNow = std::chrono::steady_clock::now();
 
-        for (const auto& logEntry : lit->second) {
+        for (const auto& logEntry : replayLog) {
             
             // Explicitly cast the duration to system_clock duration
             auto duration = std::chrono::duration_cast<std::chrono::system_clock::duration>(
