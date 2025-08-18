@@ -4,6 +4,11 @@
 
 namespace streamcache {
 
+    /*
+    * Fixed log retention duration for all keys.
+    */
+    const auto LOG_RETENTION = std::chrono::hours(1);
+
     void EvictionThread::start(Cache& target) {
         assert(!m_thread.joinable());
         assert(!m_running.load(std::memory_order_relaxed));
@@ -77,6 +82,7 @@ namespace streamcache {
 
             const auto now {std::chrono::steady_clock::now()};
             m_cache->evictExpired(now);
+            m_cache->pruneAllLogs(now - LOG_RETENTION);
         }
     }
 }
