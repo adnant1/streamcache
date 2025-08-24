@@ -10,7 +10,7 @@ namespace streamcache {
      */
     class Cache {
         public:
-            explicit Cache(size_t numShards = 1);
+            explicit Cache(size_t numShards);
             ~Cache();
 
             /**
@@ -28,7 +28,7 @@ namespace streamcache {
 
         private:
             std::vector<Shard> m_shards {};
-            size_t m_numShards {1};
+            size_t m_numShards {};
 
             size_t shardFor(const std::string& key) const;
     };
