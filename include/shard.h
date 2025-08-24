@@ -54,8 +54,8 @@ namespace streamcache {
         */
         Shard(const Shard&) = delete;
         Shard& operator=(const Shard&) = delete;
-        Shard(Shard&&) noexcept = default;
-        Shard& operator=(Shard&&) noexcept = default;
+        Shard(Shard&&) noexcept = delete;
+        Shard& operator=(Shard&&) noexcept = delete;
 
         /**
         * Adds or updates an entry in the shard.
