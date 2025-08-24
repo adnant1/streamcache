@@ -49,6 +49,14 @@ namespace streamcache {
         Shard();
         ~Shard();
 
+        /*
+        * Non-copyable, moveable only.
+        */
+        Shard(const Shard&) = delete;
+        Shard& operator=(const Shard&) = delete;
+        Shard(Shard&&) noexcept = default;
+        Shard& operator=(Shard&&) noexcept = default;
+
         /**
         * Adds or updates an entry in the shard.
         * If the entry has an expiration time, it is added to the eviction heap.
