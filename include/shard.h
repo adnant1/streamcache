@@ -1,5 +1,4 @@
 #pragma once
-#include "eviction_thread.h"
 #include <string>
 #include <unordered_map>
 #include <queue>
@@ -9,9 +8,13 @@
 #include <chrono>
 #include <shared_mutex>
 #include <atomic>
+#include <memory>
 
 namespace streamcache {
     using Timestamp = std::chrono::steady_clock::time_point;
+
+    // Forward declaration to avoid circular dependency
+    class EvictionThread;
 
     /*
     * Entry structure containing a value and relevant metadata.
@@ -142,7 +145,7 @@ namespace streamcache {
         std::unordered_map<std::string, std::deque<LogEntry>> m_logs {};
         std::function<void()> m_notifyWakeup {};
         mutable std::shared_mutex m_mutex {};
-        EvictionThread evictionThread {};
+        std::unique_ptr<EvictionThread> m_evictionThread;
 
         /**
         * Returns the logs needed for REPLAY for a given key.

@@ -4,12 +4,14 @@
 #include <iomanip>
 
 namespace streamcache {
-    Shard::Shard() {
-        evictionThread.start(*this);
+    Shard::Shard() : m_evictionThread(std::make_unique<EvictionThread>()) {
+        m_evictionThread->start(*this);
     }
 
     Shard::~Shard() {
-        evictionThread.stop();
+        if (m_evictionThread) {
+            m_evictionThread->stop();
+        }
     }
 
     void Shard::set(const std::string& key, CacheEntry entry) {
