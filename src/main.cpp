@@ -28,9 +28,9 @@ Command getCommand(const std::string& cmd) {
  */
 int main() {
     /*
-    * Initialize the cache with a fixed number of shards.
+    * Configure the cache with a fixed number of shards.
     */
-    streamcache::Cache cache(4);
+    streamcache::Cache cache(2);
 
     while(true) {
         std::cout << "> " << std::flush;
