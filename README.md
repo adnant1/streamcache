@@ -1,6 +1,6 @@
 ## What is StreamCache?
 
-**StreamCache** is a high-performance, log-backed, TTL-aware in-memory caching engine implemented in modern C++. It combines the speed of in-memory operations with a persistent append-only log to enable historical data replay, precise time-based key expiration, and efficient eviction.
+**StreamCache** is a high-performance, log-backed, TTL-aware in-memory caching engine implemented in modern C++. It combines the speed of in-memory operations with a persistent append-only log to enable historical data replay, precise time-based key expiration, efficient eviction, and sharded concurrency for improved throughput.
 
 StreamCache currently operates entirely via a CLI REPL, allowing direct command execution without a client/daemon layer (planned in a future update).
 
@@ -26,6 +26,8 @@ StreamCache’s architecture supports multiple production-grade scenarios:
 - **REPLAY** — Retrieve historical values for a key in its TTL window from the log.
 - **Append-only log** — Durable in-memory history for every key.
 - **CLI REPL** — Direct, command-line interaction with the engine.
+- **RW locks** — Readers and writers proceed concurrently with reduced contention.
+- **Sharded architecture** — Keyspace partitioned across multiple shards, each with its own lock and eviction thread for parallelism.
 
 ---
 
@@ -36,6 +38,8 @@ StreamCache’s architecture supports multiple production-grade scenarios:
 - **Background eviction thread** — Dedicated worker thread that proactively maintains the cache and logs.
 - **Append-only log** — Immutable event history per key.
 - **Multi-threaded** — REPL runs on the main thread, with eviction offloaded to a background worker.
+- **RW locks** — Concurrent readers with exclusive writers.
+- **Sharded design** — Cache is divided into multiple shards; keys are routed by hash ro reduce lock contention and improve multi-threaded scalability.
 - **Standard library only** — No external dependencies.
 
 ---
@@ -60,7 +64,6 @@ Value: Brian
 
 ## Upcoming Features
 
-- **Sharding** — Horizontal scaling.
 - **Disk AOF + snapshot + recovery** — Persistence and crash recovery.
 - **INFO / metrics + slowlog + SCAN** — Operational visibility and performance monitoring.
 
@@ -68,7 +71,7 @@ Value: Brian
 
 ## Status
 
-StreamCache is currently in active development. While stable for its core operations, additional capabilities such as persistence, sharding, and advanced monitoring are planned to extend its scalability, fault tolerance, and observability for broader use cases.
+StreamCache is currently in active development. While stable for its core operations, additional capabilities such as persistence and advanced monitoring are planned to extend its scalability, fault tolerance, and observability for broader use cases.
 
 ---
 
