@@ -38,6 +38,11 @@ namespace streamcache {
     class EvictionThread {
         public:
             /**
+             * Default constructor.
+             */
+            EvictionThread() = default;
+
+            /**
              * Start the eviction thread and begin monitoring the shard.
              * 
              * @param target Reference to the shard this thread will manage.
