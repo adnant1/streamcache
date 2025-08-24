@@ -1,11 +1,13 @@
 #pragma once
-#include "cache.h"
 #include <thread>
 #include <condition_variable>
 #include <atomic>
 #include <mutex>
 
 namespace streamcache {
+
+    // Foward declaration to avoid circular dependency
+    class Shard;
     
     /**
     * @class EvictionThread
