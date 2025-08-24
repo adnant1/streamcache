@@ -27,9 +27,7 @@ Command getCommand(const std::string& cmd) {
  * Core runtime REPL loop for the engine.
  */
 int main() {
-    streamcache::Cache cache {};
-    streamcache::EvictionThread evictionThread {};
-    evictionThread.start(cache);
+    streamcache::Cache cache(1);
 
     while(true) {
         std::cout << "> " << std::flush;
@@ -92,6 +90,5 @@ int main() {
         }
     }
 
-    evictionThread.stop();
     return 0;
 }
