@@ -1,4 +1,5 @@
 #include "eviction_thread.h"
+#include "shard.h"
 #include <cassert>
 #include <chrono>
 
