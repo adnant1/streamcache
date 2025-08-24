@@ -27,7 +27,10 @@ Command getCommand(const std::string& cmd) {
  * Core runtime REPL loop for the engine.
  */
 int main() {
-    streamcache::Cache cache(1);
+    /*
+    * Initialize the cache with a fixed number of shards.
+    */
+    streamcache::Cache cache(4);
 
     while(true) {
         std::cout << "> " << std::flush;

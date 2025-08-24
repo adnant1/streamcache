@@ -2,11 +2,8 @@
 
 namespace streamcache {
 
-    Cache::Cache(size_t numShards): m_numShards(numShards), m_shards() {
-        m_shards.reserve(numShards);
-        for (size_t i {0}; i < numShards; ++i) {
-            m_shards.emplace_back();
-        }
+    Cache::Cache(size_t numShards)
+        : m_numShards(numShards), m_shards(numShards) {
     }
     
     Cache::~Cache() {
