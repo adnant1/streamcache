@@ -102,9 +102,8 @@ namespace streamcache {
         * 
         * @param now The cutoff timestamp.
         * 
-        * @return The number of entries evicted. Used for metrics.
         */
-        size_t evictExpired(Timestamp now);
+        void evictExpired(Timestamp now);
 
         /**
         * Compares the new expiry time against the current earliest expiry in the heap.
