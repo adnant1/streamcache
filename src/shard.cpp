@@ -1,8 +1,18 @@
 #include "shard.h"
+#include "eviction_thread.h"
 #include <iostream>
 #include <iomanip>
 
 namespace streamcache {
+    streamcache::EvictionThread evictionThread {};
+
+    Shard::Shard() {
+        evictionThread.start(*this);
+    }
+
+    Shard::~Shard() {
+        evictionThread.stop();
+    }
 
     void Shard::set(const std::string& key, CacheEntry entry) {
         auto now {std::chrono::steady_clock::now()};
