@@ -9,12 +9,12 @@ namespace streamcache {
     */
     const auto LOG_RETENTION = std::chrono::hours(1);
 
-    void EvictionThread::start(Cache& target) {
+    void EvictionThread::start(Shard& target) {
         assert(!m_thread.joinable());
         assert(!m_running.load(std::memory_order_relaxed));
-        assert(m_cache == nullptr);
+        assert(m_shard == nullptr);
 
-        m_cache = &target;
+        m_shard = &target;
 
         target.setNotifyWakeup([this] {
             m_cv.notify_all();
@@ -42,7 +42,7 @@ namespace streamcache {
 
     void EvictionThread::runLoop() {
         while (m_running.load(std::memory_order_relaxed)) {
-            std::optional<Timestamp> nextExpiry {m_cache->peekNextExpiry()};
+            std::optional<Timestamp> nextExpiry {m_shard->peekNextExpiry()};
 
             /*
             * If the time has already reached/passed, don't bother sleeping.
@@ -57,7 +57,7 @@ namespace streamcache {
     
                     if(!nextExpiry) {
                         m_cv.wait(lock, [this] {
-                            return !m_running.load(std::memory_order_relaxed) || m_cache->peekNextExpiry().has_value();
+                            return !m_running.load(std::memory_order_relaxed) || m_shard->peekNextExpiry().has_value();
                         });
                     } else {
                         const Timestamp deadline {*nextExpiry};
@@ -81,8 +81,8 @@ namespace streamcache {
             }
 
             const auto now {std::chrono::steady_clock::now()};
-            m_cache->evictExpired(now);
-            m_cache->pruneAllLogs(now - LOG_RETENTION);
+            m_shard->evictExpired(now);
+            m_shard->pruneAllLogs(now - LOG_RETENTION);
         }
     }
 }

@@ -9,7 +9,7 @@ namespace streamcache {
     
     /**
     * @class EvictionThread
-    * @brief Owns and manages the background eviction thread for a Cache instance.
+    * @brief Owns and manages the background eviction thread for a single shard.
     *
     * The EvictionThread monitors the earliest expiry in the target cache and
     * wakes exactly when needed to evict expired entries in batches. Additionally,
@@ -17,37 +17,32 @@ namespace streamcache {
     * to prevent unbounded memory growth. It is designed to be event-driven (not 
     * polling) and uses a condition variable to sleep until either:
     *   1. The next scheduled eviction time is reached.
-    *   2. It is notified of an earlier expiry via Cache::notifyNewExpiry().
+    *   2. It is notified of an earlier expiry via Shard::notifyNewExpiry().
     *
     * On each wake-up cycle, the thread performs:
     * - Cache eviction: Removes expired cache entries
     * - Log maintenance: Prunes log entries older than the retention duration
     *
     * Lifecycle:
-    * - Call start(Cache&) once to launch the eviction thread.
+    * - Call start(Shard&) once to launch the eviction thread.
     * - Call stop() (or let the destructor call it) to shut down the thread
     *   cleanly before destruction.
     * - Safe to call stop() multiple times (idempotent).
     *
     * Thread safety:
-    * - The EvictionThread does not modify Cache internals directly; it calls
-    *   public, lock-aware methods on Cache (peekNextExpiry, evictExpired, pruneAllLogs).
+    * - The EvictionThread does not modify Shard internals directly; it calls
+    *   public, lock-aware methods on the Shard (peekNextExpiry, evictExpired, pruneAllLogs).
     * - Condition variable mutex is used only for sleep/wake coordination.
     *
-    * Typical usage:
-    *   streamcache::EvictionThread thread;
-    *   runner.start(myCache);
-    *   ...
-    *   runner.stop(); // optional, destructor will also stop
     */
     class EvictionThread {
         public:
             /**
-             * Start the eviction thread and begin monitoring the cache.
+             * Start the eviction thread and begin monitoring the shard.
              * 
-             * @param target Reference to the cache this thread will manage.
+             * @param target Reference to the shard this thread will manage.
              */
-            void start(Cache& target);
+            void start(Shard& target);
 
             /**
              * Signal the eviction thread to exit, wake if sleeping, and join() it.
@@ -65,7 +60,7 @@ namespace streamcache {
             std::atomic<bool> m_running {false};
             std::condition_variable_any m_cv {};
             std::mutex m_cvMutex {};
-            Cache* m_cache {nullptr};
+            Shard* m_shard {nullptr};
 
             /**
              * Main loop for the eviction thread.
