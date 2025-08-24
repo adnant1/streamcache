@@ -1,4 +1,5 @@
 #pragma once
+#include "eviction_thread.h"
 #include <string>
 #include <unordered_map>
 #include <queue>
@@ -141,6 +142,7 @@ namespace streamcache {
         std::unordered_map<std::string, std::deque<LogEntry>> m_logs {};
         std::function<void()> m_notifyWakeup {};
         mutable std::shared_mutex m_mutex {};
+        EvictionThread evictionThread {};
 
         /**
         * Returns the logs needed for REPLAY for a given key.

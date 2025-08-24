@@ -4,8 +4,6 @@
 #include <iomanip>
 
 namespace streamcache {
-    streamcache::EvictionThread evictionThread {};
-
     Shard::Shard() {
         evictionThread.start(*this);
     }
