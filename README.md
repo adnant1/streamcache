@@ -1,6 +1,6 @@
 ## What is StreamCache?
 
-**StreamCache** is a high-performance, log-backed, TTL-aware in-memory caching engine implemented in modern C++. It combines the speed of in-memory operations with a persistent append-only log to enable historical data replay, precise time-based key expiration, efficient eviction, and sharded concurrency for improved throughput.
+**StreamCache** is a high-performance, sharded, TTL-aware in-memory caching engine implemented in modern C++. It combines the speed of in-memory operations with a persistent append-only log to enable historical data replay, precise time-based key expiration, efficient eviction, and sharded concurrency for improved throughput.
 
 StreamCache currently operates entirely via a CLI REPL, allowing direct command execution without a client/daemon layer (planned in a future update).
 
